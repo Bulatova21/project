@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pythonproject21"
+version = "0.1.0"
+description = ""
+authors = ["Malika B <ibragimova.1999@list>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
