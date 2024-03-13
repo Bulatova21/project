@@ -1,59 +1,64 @@
 import json
 
-""" Функция считывающая данные из файла operations.json """
+
 def get_file(pth):
+    """ Функция считывающая данные из файла operations.json """
     with open(pth, encoding='utf-8') as file:
-        lst = json.load(file)
-    return lst
-
-""" Фильтрующая функция"""
-def get_operation_list(dic: list):
-    dic_filtred = list(filter(lambda x: x.get('date'), dic))
-    filtred_list = list(filter(lambda e: e['state'] == 'EXECUTED', dic_filtred))
-    lst = sorted(filtred_list, key=lambda d: d['date'], reverse=True)
-    return lst
+        data_file_json = json.load(file)
+    return data_file_json
 
 
-""" Функция, выводящая первую строку в программе """
-def get_first_line(col: dict):
-    s = col['date']
-    ind = s.find('T')
-    lst = s[:ind].split('-')
-    text = col['description']
-    line = lst[-1] + '.' + lst[-2] + '.' + lst[-3] + ' ' + text
-    return line
+def get_operation_list(dic):
+    """ Фильтрующая функция"""
+    list_of_filtered_dates = list(filter(lambda x: x.get('date'), dic))
+    list_of_completed_operations = list(filter(lambda e: e['state'] == 'EXECUTED', list_of_filtered_dates))
+    the_list_of_completed_operations_is_sorted_by_date = sorted(list_of_completed_operations, key=lambda d: d['date'],
+                                                                reverse=True)
+    return the_list_of_completed_operations_is_sorted_by_date
 
-""" Функция, выводящая вторую строку в программе """
-def get_second_line(col: dict):
-    s1 = col.get('from')
-    s2 = col.get('to')
 
-    def form_line(text: str):
-        lst = text.split(' ')
-        num = lst[-1]
-        f_num = num[0:4] + ' ' + num[4:6] + '** **** ' + num[-4:]
-        return ' '.join(lst[:-1]) + ' ' + f_num
+def get_first_line(data_from_file: dict):
+    """ Функция, выводящая первую строку в программе """
+    date_operations = data_from_file['date']
+    date_highlighting = date_operations.find('T')
+    date_format = date_operations[:date_highlighting].split('-')
+    text = data_from_file['description']
+    desired_date_format = date_format[-1] + '.' + date_format[-2] + '.' + date_format[-3] + ' ' + text
+    return desired_date_format
 
-    if s1 is None and s2[0:2] == 'Сч':
-        return '-> ' + s2[:4] + ' ' + s2[-4:].rjust(6, '*')
-    elif s1 is None:
-        return '-> ' + form_line(s2)
-    elif s1.startswith('Сч') and s2[:2] != 'Сч':
-        agent = s1[:4] + ' ' + s1[-4:].rjust(6, '*')
-        return agent + ' -> ' + form_line(s2)
-    elif s2.startswith('Сч') and s1[:2] != 'Сч':
-        accaunt = s2[0:4] + ' ' + s2[-4:].rjust(6, '*')
-        return form_line(s1) + ' -> ' + accaunt
-    elif s2.startswith('Сч') and s1.startswith('Сч'):
-        agent = s1[:4] + ' ' + s1[-4:].rjust(6, '*')
-        accaunt = s2[0:4] + ' ' + s2[-4:].rjust(6, '*')
+
+def get_second_line(data_from_file: dict):
+    """ Функция, выводящая вторую строку в программе """
+    value_from = data_from_file.get('from')
+    value_to = data_from_file.get('to')
+
+    def card_and_account_number(text: str):
+        text_split = text.split(' ')
+        reversed_list = text_split[-1]
+        format_numbers = reversed_list[0:4] + ' ' + reversed_list[4:6] + '** **** ' + reversed_list[-4:]
+        return ' '.join(text_split[:-1]) + ' ' + format_numbers
+
+    if value_from is None and value_to[0:2] == 'Сч':
+        return '-> ' + value_to[:4] + ' ' + value_to[-4:].rjust(6, '*')
+    elif value_from is None:
+        return '-> ' + card_and_account_number(value_to)
+    elif value_from.startswith('Сч') and value_to[:2] != 'Сч':
+        agent = value_from[:4] + ' ' + value_from[-4:].rjust(6, '*')
+        return agent + ' -> ' + card_and_account_number(value_to)
+    elif value_to.startswith('Сч') and value_from[:2] != 'Сч':
+        accaunt = value_to[0:4] + ' ' + value_to[-4:].rjust(6, '*')
+        return card_and_account_number(value_from) + ' -> ' + accaunt
+    elif value_to.startswith('Сч') and value_from.startswith('Сч'):
+        agent = value_from[:4] + ' ' + value_from[-4:].rjust(6, '*')
+        accaunt = value_to[0:4] + ' ' + value_to[-4:].rjust(6, '*')
         return agent + ' -> ' + accaunt
     else:
-        return form_line(s1) + ' -> ' + form_line(s2)
+        return card_and_account_number(value_from) + ' -> ' + card_and_account_number(value_to)
 
-""" Функция, выводящая третью строку в программе """
-def get_third_line(col: dict):
-    am_col = col['operationAmount']
-    summ = am_col['amount']
-    currency = am_col['currency']['name']
-    return summ + ' ' + currency + '.'
+
+def get_third_line(data_from_file: dict):
+    """ Функция, выводящая третью строку в программе """
+    operation_amount = data_from_file['operationAmount']
+    transfer_amount = operation_amount['amount']
+    currency = operation_amount['currency']['name']
+    return transfer_amount + ' ' + currency + '.'

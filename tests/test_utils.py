@@ -3,14 +3,14 @@ import os
 
 ROOT_DIR = os.path.dirname(__file__)
 
-coll = [
+operations = [
     {"date": "2019-08-26T10:50:58.294041", "state": "EXECUTED", },
     {"date": "2019-07-03T18:35:29.512364", "state": "CANCELED"},
     {}
 ]
 
-col_date = {"date": "2019-08-26T10:50:58.294041",
-            "description": "Перевод организации"}
+format_date = {"date": "2019-08-26T10:50:58.294041",
+               "description": "Перевод организации"}
 
 col_second_line = {"from": "Maestro 1596837868705199",
                    "to": "Счет 64686473678894779589"}
@@ -23,11 +23,15 @@ col_second_line3 = {"from": "Счет 17066032701791012883",
                     "to": "Visa Classic 4195191172583802"}
 col_second_line4 = {"to": "Visa Classic 4195191172583802"}
 
-PATH = os.path.join(ROOT_DIR, 'tests', 'test_json_file.json')
+PATH = os.path.join(ROOT_DIR, 'test_json_file.json')
 
-amaunt_col = {"operationAmount": {"amount": "49192.52", "currency": {
+amount = {"operationAmount": {"amount": "49192.52", "currency": {
     "name": "USD",
     "code": "USD"}}}
+
+# amaunt_col = {"operationAmount": {"amount": "49192.52", "currency": {
+#     "name": "USD",
+#     "code": "USD"}}}
 
 
 def test_get_file():
@@ -39,11 +43,11 @@ def test_get_file():
 
 
 def test_get_operation_list():
-    assert utils.get_operation_list(coll) == [{"date": "2019-08-26T10:50:58.294041", "state": "EXECUTED", }]
+    assert utils.get_operation_list(operations) == [{"date": "2019-08-26T10:50:58.294041", "state": "EXECUTED", }]
 
 
 def test_get_first_line():
-    assert utils.get_first_line(col_date) == '26.08.2019 Перевод организации'
+    assert utils.get_first_line(format_date) == '26.08.2019 Перевод организации'
 
 
 def test_get_second_line():
@@ -53,5 +57,6 @@ def test_get_second_line():
     assert utils.get_second_line(col_second_line3) == 'Счет **2883 -> Visa Classic 4195 19** **** 3802'
     assert utils.get_second_line(col_second_line4) == '-> Visa Classic 4195 19** **** 3802'
 
+
 def test_third_line():
-    assert utils.get_third_line(amaunt_col) == '49192.52 USD.'
+    assert utils.get_third_line(amount) == '49192.52 USD.'
